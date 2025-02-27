@@ -28,7 +28,6 @@ class RightSideStepComponent extends StatelessWidget {
               spacing: 16,
               children: [
                 Text('LADO DIREITO'),
-                FilledButton(onPressed: onNext, child: Text('Avançar')),
               ],
             ),
           ],

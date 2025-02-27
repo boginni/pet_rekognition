@@ -28,7 +28,6 @@ class UpSideStepComponent extends StatelessWidget {
               spacing: 16,
               children: [
                 Text('FACE PARA CIMA'),
-                FilledButton(onPressed: onNext, child: Text('Avançar')),
               ],
             ),
           ],

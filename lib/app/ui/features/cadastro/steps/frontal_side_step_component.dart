@@ -29,7 +29,6 @@ class FrontalSideStepComponent extends StatelessWidget {
               spacing: 16,
               children: [
                 Text('FRONTAL $index'),
-                FilledButton(onPressed: onNext, child: Text('Avançar')),
               ],
             ),
           ],

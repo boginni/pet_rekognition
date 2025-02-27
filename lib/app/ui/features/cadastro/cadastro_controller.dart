@@ -1,8 +1,10 @@
 import 'package:camera/camera.dart';
-
-import 'cadastro_state.dart';
+import 'package:get_it/get_it.dart';
+import 'package:pet_recognition/app/domain/pet_repository.dart';
 
 class CadastroController {
+  late final PetRepository petRepository = GetIt.instance.get();
+
   Future<CameraController> getCameraController() async {
     final cameras = await availableCameras();
 
@@ -17,4 +19,12 @@ class CadastroController {
     return cameraController;
   }
 
+  Future<bool> register(XFile image) async {
+    try {
+      await petRepository.register(image);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

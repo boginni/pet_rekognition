@@ -28,7 +28,6 @@ class LeftSideStepComponent extends StatelessWidget {
               spacing: 16,
               children: [
                 Text('LADO ESQUERDO'),
-                FilledButton(onPressed: onNext, child: Text('Avançar')),
               ],
             ),
           ],

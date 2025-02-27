@@ -28,7 +28,6 @@ class DownSideStepComponent extends StatelessWidget {
               spacing: 16,
               children: [
                 Text('FACE PARA BAIXO'),
-                FilledButton(onPressed: onNext, child: Text('Avançar')),
               ],
             ),
           ],

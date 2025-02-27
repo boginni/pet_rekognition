@@ -14,11 +14,7 @@ class PetFaceComponent extends StatelessWidget {
         width: double.infinity,
         height: double.infinity,
         padding: const EdgeInsets.all(16 * 2),
-        child: Material(
-          clipBehavior: Clip.antiAlias,
-          shape: OvalBorder(side: BorderSide(color: colors.primary, width: 2)),
-          child: cameraBuilder(context),
-        ),
+        child: cameraBuilder(context),
       ),
     );
   }
