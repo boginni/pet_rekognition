@@ -36,11 +36,11 @@ class ResultLoboComponent extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               spacing: 16,
               children: [
-                Text('${accuracy.toStringAsFixed(1)}%'),
-                Icon(
-                  Icons.check_circle_sharp,
-                  color: Theme.of(context).colorScheme.secondary,
-                  size: 16 * 8,
+                Text('${(accuracy * 100.0).toStringAsFixed(1)}%'),
+                SizedBox(
+                  width: 128,
+                  height: 128,
+                  child: Image.asset('assets/lobo.png'),
                 ),
                 Text('TRILHA LOBO'),
                 FilledButton(onPressed: onFinish, child: Text('FINALIZAR')),

@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:pet_recognition/app/domain/either.dart';
 
 sealed class ConsultaState {
   const ConsultaState();
@@ -18,8 +19,9 @@ final class ConsultaErrorState extends ConsultaState {
 
 final class ConsultaResultCrocodiloState extends ConsultaState {
   final XFile capturedImage;
+  final Either<XFile, String> bestMatch;
 
-  const ConsultaResultCrocodiloState(this.capturedImage);
+  const ConsultaResultCrocodiloState(this.capturedImage, this.bestMatch);
 }
 
 final class ConsultaResultLoboState extends ConsultaState {

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:pet_recognition/app/domain/either.dart';
 import 'package:pet_recognition/app/ui/features/consulta/steps/consulta_error_step_component.dart';
 import 'package:pet_recognition/app/ui/features/consulta/steps/loading_component.dart';
 import 'package:pet_recognition/app/ui/features/consulta/steps/pet_capture_component.dart';
@@ -92,7 +93,7 @@ class _ConsultaPageState extends State<ConsultaPage>
       final matches = result.matches;
 
       if (matches?.isEmpty ?? true) {
-        state.value = ConsultaResultCrocodiloState(image);
+        state.value = ConsultaResultCrocodiloState(image, Either.left(image));
         return;
       }
 
@@ -112,9 +113,9 @@ class _ConsultaPageState extends State<ConsultaPage>
         return;
       }
 
-      state.value = ConsultaResultCrocodiloState(image);
-    } on PetNotFoundFailure catch (e) {
-      state.value = ConsultaResultCrocodiloState(image);
+      state.value = ConsultaResultCrocodiloState(image, Either.right(url));
+    } on PetNotFoundFailure catch (_) {
+      state.value = ConsultaResultCrocodiloState(image, Either.left(image));
     } catch (e) {
       state.value = ConsultaErrorState();
     }
@@ -162,10 +163,17 @@ class _ConsultaPageState extends State<ConsultaPage>
               child: PetFaceComponent(cameraBuilder: cameraBuilder),
             ),
             ConsultaLoadingState() => const LoadingComponent(),
-            ConsultaResultCrocodiloState(capturedImage: final capturedImage) =>
+            ConsultaResultCrocodiloState(
+              capturedImage: final capturedImage,
+              bestMatch: final bestMatch,
+            ) =>
               ResultCrocodiloComponent(
                 onFinish: finish,
-                image: FileImage(File(capturedImage.path)),
+                leftImage: FileImage(File(capturedImage.path)),
+                rightImage: bestMatch.fold(
+                  (left) => FileImage(File(left.path)),
+                  (right) => NetworkImage(right),
+                ),
               ),
             ConsultaResultLoboState(
               accuracy: final accuracy,

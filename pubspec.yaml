@@ -26,7 +26,10 @@ flutter:
   uses-material-design: true
   assets:
     - assets/pet_photo.jpeg
-  
+    - assets/crocodilo.png
+    - assets/aguia.png
+    - assets/lobo.png
+
   
   
   
