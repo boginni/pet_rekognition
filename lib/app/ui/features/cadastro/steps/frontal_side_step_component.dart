@@ -5,11 +5,9 @@ class FrontalSideStepComponent extends StatelessWidget {
     super.key,
     required this.index,
     required this.child,
-    required this.onNext,
   });
   final int index;
   final Widget child;
-  final VoidCallback onNext;
 
   @override
   Widget build(BuildContext context) {

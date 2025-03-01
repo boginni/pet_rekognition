@@ -19,12 +19,24 @@ class CadastroController {
     return cameraController;
   }
 
-  Future<bool> register(XFile image) async {
-    try {
-      await petRepository.register(image);
-      return true;
-    } catch (e) {
-      return false;
-    }
+  Future<int> register(List<XFile> images, {Function(double)? callback}) async {
+    int count = 0;
+    final total = images.length.toDouble();
+
+    final results = await Future.wait(
+      images.map((image) async {
+        try {
+          await petRepository.register(image);
+          return true;
+        } catch (e) {
+          return false;
+        } finally {
+          count++;
+          callback?.call(count / total);
+        }
+      }),
+    );
+
+    return results.where((element) => element).length;
   }
 }

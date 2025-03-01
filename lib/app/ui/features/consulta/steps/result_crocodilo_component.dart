@@ -5,13 +5,11 @@ class ResultCrocodiloComponent extends StatelessWidget {
   const ResultCrocodiloComponent({
     super.key,
     required this.onFinish,
-    required this.leftImage,
-    required this.rightImage,
+    required this.image,
   });
 
   final VoidCallback onFinish;
-  final ImageProvider leftImage;
-  final ImageProvider rightImage;
+  final ImageProvider image;
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +24,8 @@ class ResultCrocodiloComponent extends StatelessWidget {
           children: [
             Text('RESULTADO', textAlign: TextAlign.center),
             PetComparisonComponent(
-              leftImage: leftImage,
-              rightImage: rightImage,
+              leftImage: image,
+              rightImage: image,
               borderColor: Theme.of(context).colorScheme.error,
             ),
             Column(

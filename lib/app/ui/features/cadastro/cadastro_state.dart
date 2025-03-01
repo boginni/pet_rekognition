@@ -31,3 +31,11 @@ final class DownSideState extends CadastroState {
 final class CadastroFinalizeState extends CadastroState {
   const CadastroFinalizeState();
 }
+
+final class CadastroLoadingState extends CadastroState {
+  const CadastroLoadingState();
+}
+
+final class CadastroErrorState extends CadastroState {
+  const CadastroErrorState();
+}

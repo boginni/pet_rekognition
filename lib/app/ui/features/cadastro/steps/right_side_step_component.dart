@@ -4,11 +4,9 @@ class RightSideStepComponent extends StatelessWidget {
   const RightSideStepComponent({
     super.key,
     required this.child,
-    required this.onNext,
   });
 
   final Widget child;
-  final VoidCallback onNext;
 
   @override
   Widget build(BuildContext context) {

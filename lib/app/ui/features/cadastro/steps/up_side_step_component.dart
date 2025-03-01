@@ -4,11 +4,9 @@ class UpSideStepComponent extends StatelessWidget {
   const UpSideStepComponent({
     super.key,
     required this.child,
-    required this.onNext,
   });
 
   final Widget child;
-  final VoidCallback onNext;
 
   @override
   Widget build(BuildContext context) {

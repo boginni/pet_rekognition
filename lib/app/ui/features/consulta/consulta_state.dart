@@ -12,11 +12,14 @@ final class ConsultaLoadingState extends ConsultaState {
   const ConsultaLoadingState();
 }
 
+final class ConsultaErrorState extends ConsultaState {
+  const ConsultaErrorState();
+}
+
 final class ConsultaResultCrocodiloState extends ConsultaState {
   final XFile capturedImage;
-  final XFile bestMatch;
 
-  const ConsultaResultCrocodiloState(this.capturedImage, this.bestMatch);
+  const ConsultaResultCrocodiloState(this.capturedImage);
 }
 
 final class ConsultaResultLoboState extends ConsultaState {

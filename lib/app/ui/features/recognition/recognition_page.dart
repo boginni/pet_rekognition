@@ -22,7 +22,6 @@ class _RecognitionPageState extends State<RecognitionPage> {
   Future<void> initCamera() async {
     final cameras = await availableCameras();
 
-    print('Cameras: $cameras');
 
     if (cameras.isEmpty) {
       return;

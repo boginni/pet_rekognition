@@ -2,12 +2,15 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:pet_recognition/app/ui/features/consulta/steps/consulta_error_step_component.dart';
 import 'package:pet_recognition/app/ui/features/consulta/steps/loading_component.dart';
 import 'package:pet_recognition/app/ui/features/consulta/steps/pet_capture_component.dart';
 import 'package:pet_recognition/app/ui/features/consulta/steps/result_aguia_component.dart';
 import 'package:pet_recognition/app/ui/features/consulta/steps/result_crocodilo_component.dart';
 import 'package:pet_recognition/app/ui/features/consulta/steps/result_lobo_component.dart';
 
+import '../../../domain/failures.dart';
+import '../../widgets/camera_view_component.dart';
 import '../../widgets/pet_face_component.dart';
 import 'consulta_controller.dart';
 import 'consulta_state.dart';
@@ -19,11 +22,16 @@ class ConsultaPage extends StatefulWidget {
   State<ConsultaPage> createState() => _ConsultaPageState();
 }
 
-class _ConsultaPageState extends State<ConsultaPage> {
+class _ConsultaPageState extends State<ConsultaPage>
+    with SingleTickerProviderStateMixin {
   final state = ValueNotifier<ConsultaState>(ConsultaCapturaState());
   final controller = ConsultaController();
   CameraController? cameraController;
   XFile? capturedImage;
+  late final animationController = AnimationController(
+    duration: const Duration(seconds: 3),
+    vsync: this,
+  );
 
   @override
   void initState() {
@@ -41,46 +49,81 @@ class _ConsultaPageState extends State<ConsultaPage> {
   Future<XFile?> _takePicture() async {
     final CameraController? cameraController = this.cameraController;
     if (cameraController == null || !cameraController.value.isInitialized) {
-      print('Error: select a camera first.');
       return null;
     }
 
     if (cameraController.value.isTakingPicture) {
-      print('Camera is already taking a picture');
       return null;
     }
 
     try {
       final XFile file = await cameraController.takePicture();
       return file;
-    } on CameraException catch (e) {
-      print('Error: ${e.code}\nError Message: ${e.description}');
+    } catch (_) {
       return null;
     }
-  }
-
-  Future<void> takePicture() async {
-    final image = await _takePicture();
-
-    if (image == null) {
-      return;
-    }
-
-    capturedImage = image;
   }
 
   void finish() {
     Navigator.of(context).pop();
   }
 
+  void search() async {
+    final image = await _takePicture();
+
+    if (image == null) {
+      state.value = ConsultaErrorState();
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Erro ao tirar foto')));
+      }
+
+      return;
+    }
+
+    state.value = ConsultaLoadingState();
+
+    try {
+      capturedImage = image;
+      await controller.consultar(image);
+    } on PetNotFoundFailure catch (e) {
+      state.value = ConsultaResultCrocodiloState(image);
+    } catch (e) {
+      state.value = ConsultaErrorState();
+    }
+  }
+
+  void initCaptura() async {
+    animationController.reset();
+    animationController.forward().then((value) {
+      search();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     cameraBuilder(BuildContext context) {
       if (cameraController != null) {
-        return CameraPreview(cameraController!);
+        return ValueListenableBuilder(
+          valueListenable: animationController,
+          builder: (context, value, _) {
+            final counter = (3 - (value * 3)).ceil();
+
+            return Center(
+              child: CameraViewComponent(
+                progressValue: value,
+                cameraController: cameraController!,
+                showCounter: animationController.isAnimating,
+                counter: counter,
+              ),
+            );
+          },
+        );
       }
 
-      return const CircularProgressIndicator();
+      return Center(child: const CircularProgressIndicator());
     }
 
     return Scaffold(
@@ -90,27 +133,16 @@ class _ConsultaPageState extends State<ConsultaPage> {
         builder: (context, value, child) {
           return switch (value) {
             ConsultaCapturaState() => PetCaptureComponent(
-              onNext: () async {
-                await takePicture();
-                state.value = ConsultaLoadingState();
-                Future.delayed(const Duration(seconds: 2), () {
-                  state.value = ConsultaResultCrocodiloState(
-                    capturedImage!,
-                    capturedImage!,
-                  );
-                });
-              },
+              onNext: initCaptura,
               child: PetFaceComponent(cameraBuilder: cameraBuilder),
             ),
             ConsultaLoadingState() => const LoadingComponent(),
             ConsultaResultCrocodiloState(
               capturedImage: final capturedImage,
-              bestMatch: final bestMatch,
             ) =>
               ResultCrocodiloComponent(
                 onFinish: finish,
-                leftImage: FileImage(File(capturedImage.path)),
-                rightImage: FileImage(File(capturedImage.path)),
+                image: FileImage(File(capturedImage.path)),
               ),
             ConsultaResultLoboState(
               accuracy: final accuracy,
@@ -134,6 +166,11 @@ class _ConsultaPageState extends State<ConsultaPage> {
                 leftImage: FileImage(File(capturedImage.path)),
                 rightImage: FileImage(File(capturedImage.path)),
               ),
+            ConsultaErrorState() => ConsultaErrorStepComponent(
+              onPressed: () {
+                state.value = ConsultaCapturaState();
+              },
+            ),
           };
         },
       ),

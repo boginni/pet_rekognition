@@ -21,7 +21,21 @@ class PetRepositoryImpl implements PetRepository {
 
   @override
   Future<void> search(XFile photo) async {
-    await dio.post('/search');
+    try {
+      final response = await dio.post(
+        '/search',
+        data: FormData.fromMap({
+          "image": await MultipartFile.fromFile(photo.path),
+        }),
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+
+      }
+
+
+    }
+
   }
 
   @override
@@ -34,8 +48,6 @@ class PetRepositoryImpl implements PetRepository {
       },
     );
 
-
     return response.data['token'];
-
   }
 }
