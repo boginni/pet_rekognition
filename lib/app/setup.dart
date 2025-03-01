@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
-import 'package:pet_recognition/app/externall/pet_repository_impl.dart';
 
 import 'domain/pet_repository.dart';
+import 'external/pet_repository_impl.dart';
 
 void setup() {
   final i = GetIt.instance;

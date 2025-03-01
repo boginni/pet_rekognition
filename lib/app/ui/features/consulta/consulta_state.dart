@@ -25,7 +25,7 @@ final class ConsultaResultCrocodiloState extends ConsultaState {
 final class ConsultaResultLoboState extends ConsultaState {
   final double accuracy;
   final XFile capturedImage;
-  final XFile bestMatch;
+  final String? bestMatch;
 
   const ConsultaResultLoboState(
     this.accuracy,
@@ -35,9 +35,9 @@ final class ConsultaResultLoboState extends ConsultaState {
 }
 
 final class ConsultaResultAguiaState extends ConsultaState {
-  final XFile capturedImage;
-  final XFile bestMatch;
   final double accuracy;
+  final XFile capturedImage;
+  final String? bestMatch;
 
   const ConsultaResultAguiaState(
     this.accuracy,

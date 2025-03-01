@@ -1,3 +1,3 @@
 class PetNotFoundFailure implements Exception {
-  PetNotFoundFailure();
+  const PetNotFoundFailure();
 }

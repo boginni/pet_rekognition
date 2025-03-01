@@ -42,7 +42,7 @@ class ResultLoboComponent extends StatelessWidget {
                   color: Theme.of(context).colorScheme.secondary,
                   size: 16 * 8,
                 ),
-                Text('TRILHA CROCODILO'),
+                Text('TRILHA LOBO'),
                 FilledButton(onPressed: onFinish, child: Text('FINALIZAR')),
               ],
             ),

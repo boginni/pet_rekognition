@@ -87,7 +87,32 @@ class _ConsultaPageState extends State<ConsultaPage>
 
     try {
       capturedImage = image;
-      await controller.consultar(image);
+      final result = await controller.consultar(image);
+
+      final matches = result.matches;
+
+      if (matches?.isEmpty ?? true) {
+        state.value = ConsultaResultCrocodiloState(image);
+        return;
+      }
+
+      final bestMatch = matches!.first;
+
+      final score = bestMatch.score ?? 0;
+
+      final url = bestMatch.rawImage ?? bestMatch.facialImage;
+
+      if (score >= 0.9) {
+        state.value = ConsultaResultAguiaState(score, image, url);
+        return;
+      }
+
+      if (score >= 0.8) {
+        state.value = ConsultaResultLoboState(score, image, url);
+        return;
+      }
+
+      state.value = ConsultaResultCrocodiloState(image);
     } on PetNotFoundFailure catch (e) {
       state.value = ConsultaResultCrocodiloState(image);
     } catch (e) {
@@ -137,9 +162,7 @@ class _ConsultaPageState extends State<ConsultaPage>
               child: PetFaceComponent(cameraBuilder: cameraBuilder),
             ),
             ConsultaLoadingState() => const LoadingComponent(),
-            ConsultaResultCrocodiloState(
-              capturedImage: final capturedImage,
-            ) =>
+            ConsultaResultCrocodiloState(capturedImage: final capturedImage) =>
               ResultCrocodiloComponent(
                 onFinish: finish,
                 image: FileImage(File(capturedImage.path)),
@@ -153,7 +176,7 @@ class _ConsultaPageState extends State<ConsultaPage>
                 onFinish: finish,
                 accuracy: accuracy,
                 leftImage: FileImage(File(capturedImage.path)),
-                rightImage: FileImage(File(capturedImage.path)),
+                rightImage: NetworkImage(bestMatch ?? ''),
               ),
             ConsultaResultAguiaState(
               accuracy: final accuracy,
@@ -164,7 +187,7 @@ class _ConsultaPageState extends State<ConsultaPage>
                 onFinish: finish,
                 accuracy: accuracy,
                 leftImage: FileImage(File(capturedImage.path)),
-                rightImage: FileImage(File(capturedImage.path)),
+                rightImage: NetworkImage(bestMatch ?? ''),
               ),
             ConsultaErrorState() => ConsultaErrorStepComponent(
               onPressed: () {
