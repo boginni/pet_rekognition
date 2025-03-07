@@ -1,5 +1,6 @@
-import 'package:camera/camera.dart';
-import 'package:pet_recognition/app/domain/either.dart';
+import 'package:flutter/material.dart';
+
+import '../../../domain/result_match_entity.dart';
 
 sealed class ConsultaState {
   const ConsultaState();
@@ -17,33 +18,15 @@ final class ConsultaErrorState extends ConsultaState {
   const ConsultaErrorState();
 }
 
-final class ConsultaResultCrocodiloState extends ConsultaState {
-  final XFile capturedImage;
-  final Either<XFile, String> bestMatch;
+final class ConsultaNotFoundState extends ConsultaState {
+  final ImageProvider petImage;
 
-  const ConsultaResultCrocodiloState(this.capturedImage, this.bestMatch);
+  const ConsultaNotFoundState(this.petImage);
 }
 
-final class ConsultaResultLoboState extends ConsultaState {
-  final double accuracy;
-  final XFile capturedImage;
-  final String? bestMatch;
+final class ConsultaResultState extends ConsultaState {
+  final List<ResultMatchesEntity> matches;
+  final ImageProvider petImage;
 
-  const ConsultaResultLoboState(
-    this.accuracy,
-    this.capturedImage,
-    this.bestMatch,
-  );
-}
-
-final class ConsultaResultAguiaState extends ConsultaState {
-  final double accuracy;
-  final XFile capturedImage;
-  final String? bestMatch;
-
-  const ConsultaResultAguiaState(
-    this.accuracy,
-    this.capturedImage,
-    this.bestMatch,
-  );
+  const ConsultaResultState({required this.matches, required this.petImage});
 }

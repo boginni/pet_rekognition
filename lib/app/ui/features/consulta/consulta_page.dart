@@ -2,13 +2,11 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:pet_recognition/app/domain/either.dart';
 import 'package:pet_recognition/app/ui/features/consulta/steps/consulta_error_step_component.dart';
 import 'package:pet_recognition/app/ui/features/consulta/steps/loading_component.dart';
 import 'package:pet_recognition/app/ui/features/consulta/steps/pet_capture_component.dart';
-import 'package:pet_recognition/app/ui/features/consulta/steps/result_aguia_component.dart';
+import 'package:pet_recognition/app/ui/features/consulta/steps/result_component.dart';
 import 'package:pet_recognition/app/ui/features/consulta/steps/result_crocodilo_component.dart';
-import 'package:pet_recognition/app/ui/features/consulta/steps/result_lobo_component.dart';
 
 import '../../../domain/failures.dart';
 import '../../widgets/camera_view_component.dart';
@@ -84,6 +82,8 @@ class _ConsultaPageState extends State<ConsultaPage>
       return;
     }
 
+    final imageProvider = FileImage(File(image.path));
+
     state.value = ConsultaLoadingState();
 
     try {
@@ -93,7 +93,7 @@ class _ConsultaPageState extends State<ConsultaPage>
       final matches = result.matches;
 
       if (matches?.isEmpty ?? true) {
-        state.value = ConsultaResultCrocodiloState(image, Either.left(image));
+        state.value = ConsultaNotFoundState(imageProvider);
         return;
       }
 
@@ -103,19 +103,13 @@ class _ConsultaPageState extends State<ConsultaPage>
 
       final url = bestMatch.rawImage ?? bestMatch.facialImage;
 
-      if (score >= 0.9) {
-        state.value = ConsultaResultAguiaState(score, image, url);
-        return;
-      }
-
-      if (score >= 0.8) {
-        state.value = ConsultaResultLoboState(score, image, url);
-        return;
-      }
-
-      state.value = ConsultaResultCrocodiloState(image, Either.right(url));
+      state.value = ConsultaResultState(
+        matches:
+            matches..sort((a, b) => (b.score ?? 0).compareTo(a.score ?? 0)),
+        petImage: imageProvider,
+      );
     } on PetNotFoundFailure catch (_) {
-      state.value = ConsultaResultCrocodiloState(image, Either.left(image));
+      state.value = ConsultaNotFoundState(imageProvider);
     } catch (e) {
       state.value = ConsultaErrorState();
     }
@@ -163,42 +157,21 @@ class _ConsultaPageState extends State<ConsultaPage>
               child: PetFaceComponent(cameraBuilder: cameraBuilder),
             ),
             ConsultaLoadingState() => const LoadingComponent(),
-            ConsultaResultCrocodiloState(
-              capturedImage: final capturedImage,
-              bestMatch: final bestMatch,
-            ) =>
-              ResultCrocodiloComponent(
-                onFinish: finish,
-                leftImage: FileImage(File(capturedImage.path)),
-                rightImage: bestMatch.fold(
-                  (left) => FileImage(File(left.path)),
-                  (right) => NetworkImage(right),
-                ),
-              ),
-            ConsultaResultLoboState(
-              accuracy: final accuracy,
-              capturedImage: final capturedImage,
-              bestMatch: final bestMatch,
-            ) =>
-              ResultLoboComponent(
-                onFinish: finish,
-                accuracy: accuracy,
-                leftImage: FileImage(File(capturedImage.path)),
-                rightImage: NetworkImage(bestMatch ?? ''),
-              ),
-            ConsultaResultAguiaState(
-              accuracy: final accuracy,
-              capturedImage: final capturedImage,
-              bestMatch: final bestMatch,
-            ) =>
-              ResultAguiaComponent(
-                onFinish: finish,
-                accuracy: accuracy,
-                leftImage: FileImage(File(capturedImage.path)),
-                rightImage: NetworkImage(bestMatch ?? ''),
-              ),
             ConsultaErrorState() => ConsultaErrorStepComponent(
               onPressed: () {
+                state.value = ConsultaCapturaState();
+              },
+            ),
+            ConsultaNotFoundState() => ResultCrocodiloComponent(
+              leftImage: value.petImage,
+              onFinish: () {
+                state.value = ConsultaCapturaState();
+              },
+            ),
+            ConsultaResultState() => ResultComponent(
+              matches: value.matches,
+              petImage: value.petImage,
+              onFinish: () {
                 state.value = ConsultaCapturaState();
               },
             ),

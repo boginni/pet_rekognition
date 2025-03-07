@@ -1,56 +1,22 @@
+import 'package:pet_recognition/app/domain/result_match_entity.dart';
+
 class SearchResultEntity {
-  List<Matches>? matches;
+  final List<ResultMatchesEntity>? matches;
 
-  SearchResultEntity({this.matches});
+  const SearchResultEntity({this.matches});
 
-  SearchResultEntity.fromJson(Map<String, dynamic> json) {
-    if (json['matches'] != null) {
-      matches = <Matches>[];
-      json['matches'].forEach((v) {
-        matches!.add(Matches.fromJson(v));
-      });
-    }
+  factory SearchResultEntity.fromJson(Map<String, dynamic> json) {
+    return SearchResultEntity(
+      matches:
+          json['matches'] != null
+              ? (json['matches'] as List)
+                  .map((i) => ResultMatchesEntity.fromJson(i))
+                  .toList()
+              : null,
+    );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (matches != null) {
-      data['matches'] = matches!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-}
-
-class Matches {
-  String? id;
-  String? rawImage;
-  String? facialImage;
-  double? score;
-  int? registerTimestamp;
-
-  Matches({
-    this.id,
-    this.rawImage,
-    this.facialImage,
-    this.score,
-    this.registerTimestamp,
-  });
-
-  Matches.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    rawImage = json['raw_image'];
-    facialImage = json['facial_image'];
-    score = json['score'];
-    registerTimestamp = json['register_timestamp'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['raw_image'] = rawImage;
-    data['facial_image'] = facialImage;
-    data['score'] = score;
-    data['register_timestamp'] = registerTimestamp;
-    return data;
+    return {'matches': matches?.map((e) => e.toJson()).toList()};
   }
 }
